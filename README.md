@@ -61,36 +61,34 @@ This project is licensed under the MIT License.
 ```mermaid
 graph TD
     %% 外部データ
-    LO[Your Esps LoadOrder] --> SE[synthesis patch: slotExporter]
-    
-    %% 将来の構想
-    FutureTool["Future: Simplified Editing Tool (Planned)"] -.->|Planned replacement| EX_TXT
+    LO[Your Esps LoadOrder] --> SE[1st step>synthesis patch: slotExporter]
 
     %% エクスポート工程
-    SE -- "1. Export Slot Data" --> EX_TXT((slotdata-*.txt))
-    Manual[Manual Editing] --> EX_TXT
+    SE -- "1.1 Export Slot Data" --> EX_TXT((slotdata-*.txt))
+    
+    %% ★ここを修正：テキストを "" で囲みました
+    Manual["Edit Rules Here<br/>(Define Slot Changes)"] <--> EX_TXT
+    style Manual fill:#ffcccc,stroke:#ff0000,stroke-width:2px,color:#000
     
     %% Nif Slot Sniper側の工程
     subgraph "Nif Slot Sniper (Mesh Side)"
-        EX_TXT -- "2. Import Text & Read Path" --> NSS[Nif Slot Sniper]
-        NSS -- "3. Locate & Load" --> NIF_IN[.NIF File]
-        NIF_IN -- "Data for Editing" --> NSS
-        NSS -- "4. Save Updated NIF" --> NIF_OUT[.NIF File]
+        EX_TXT -- "2.1 Import Text & Read Path" --> NSS[2nd step>Nif Slot Sniper]
+        NSS -- "2.2 Locate & Load" --> NIF_IN[.NIF File]
+        NIF_IN -- " 2.3 Data for Editing" --> NSS
+        NSS -- "2.4 Save Updated NIF" --> NIF_OUT[.NIF File]
     end
     
     %% Synthesis側の工程
     subgraph "Synthesis (ESP Side)"
-        EX_TXT -- "Read Text" --> SI[synthesis patch: slotImporter]
+        EX_TXT -- "3.1 Read Text" --> SI[3rd step>synthesis patch: slotImporter]
         LO --> SI
-        SI -- "Update ESP Data" --> ESP_OUT[.esp]
+        SI -- "3.2 Update ESP Data" --> ESP_OUT[.esp] ==> FESP[3.3 end of ESP side slot changing]
     end
     
     %% 最終結果
-    NIF_OUT <==>|Synchronization| ESP_OUT
+    NIF_OUT ==> FNIF[2.5 end of NIF side slot changing]
     
     %% スタイル設定
     style NSS fill:#d4edda,stroke:#28a745
     style SI fill:#fff3cd,stroke:#ffc107
     style EX_TXT fill:#f8d7da,stroke:#dc3545
-    %% 将来ツールのスタイル（グレーの点線枠）
-    style FutureTool stroke-dasharray: 5 5,fill:#e9ecef,stroke:#6c757d
